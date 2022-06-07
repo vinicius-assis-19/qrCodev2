@@ -7,9 +7,13 @@ import Cadastro from '../pages/cadastro';
 const Tab = createBottomTabNavigator();
 
 const AuthRoutes = () => (
-    <Tab.Navigator>    
-        <Tab.Screen options={{tabBarVisible: false}} name="Login" component={Login} />
-        <Tab.Screen options={{tabBarVisible: false}} name="Cadastro" component={Cadastro} />
+    <Tab.Navigator
+        screenOptions={{
+            tabBarVisible:false
+        }}
+    >    
+        <Tab.Screen options={{tabBarVisible: true}} name="Login" component={Login} />
+        <Tab.Screen options={{tabBarVisible: true}} name="Cadastro" component={Cadastro} />
     </Tab.Navigator>
 );
 

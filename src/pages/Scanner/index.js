@@ -25,7 +25,7 @@ export default function Scanner(){
             <View>
                 <QRCodeScanner
                     onRead={onSuccess}
-                    flashMode={RNCamera.Constants.FlashMode.torch}
+                    // flashMode={RNCamera.Constants.FlashMode.torch}
                     topContent={
                     <Text style={styles.centerText}>
                         Go to{' '}

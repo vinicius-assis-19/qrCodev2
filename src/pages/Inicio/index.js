@@ -5,12 +5,14 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import AuthContext from '../../context/auth';
 import QRCode from 'react-native-qrcode-svg';
 
-export default function Inicio(){
-    const [verUsuario, setUsuario] = useState('');
+export default function Inicio(){    
+    const [usuario, setUsuario] = useState('');
+    const [nome, setNome] = useState('');
+    const [imagemPerfil, setImagemPerfil] = useState('');
     const [dados, setDados] = useState('');
     const {user} = useContext(AuthContext)
-    const [isEnabled, setIsEnabled] = useState(false);
-    const toggleSwitch = () => setIsEnabled(previousState => !previousState);
+    // const [isEnabled, setIsEnabled] = useState(false);
+    // const toggleSwitch = () => setIsEnabled(previousState => !previousState);
 
     useEffect(()=>{        
         async function carregarUsuario(){
@@ -18,9 +20,9 @@ export default function Inicio(){
             .child(user.uid)            
             .on('value', (snapshot)=>{
                 var nome = snapshot.child("nome").val();
-                var dados = snapshot.val();
-                setDados(dados)
+                var imagemPerfil = snapshot.child("imagemPerfil").val();                
                 setUsuario(nome)
+                setImagemPerfil(imagemPerfil)
             })
         }
         carregarUsuario();
@@ -33,26 +35,30 @@ export default function Inicio(){
             </View>            
             <View style={{backgroundColor: 'white', flex: 1, width: '100%', height:'85%',  alignItems: 'center',}}>
                 <View style={styles.containerImagem}>
-                    <Image
-                        source={{uri: dados.imagemPerfil}}
-                        style={{
-                            height: "70%",
-                            width: "70%"
-                        }}                        
-                    />
+                    {!imagemPerfil ?
+                        <Icon name="person-circle"/>
+                        :
+                        <Image
+                            source={{uri: imagemPerfil}}
+                            style={{
+                                height: "70%",
+                                width: "70%"
+                            }}                        
+                        />
+                    }                    
                 </View>
                 <View style={{margin: 20}}>                    
                     <Text style={{fontSize: 30}}>
-                        {dados.nome}
+                        {usuario}
                     </Text>
                 </View>
                 <View>
                     <QRCode
-                        value={dados.instagram}                             
+                        // value={dados.instagram}                             
                         size={200}
                     />
                 </View>
-                <View style={{margin: 40, flexDirection: 'row', alignItems:'center', justifyContent:'space-between'}}>
+                {/* <View style={{margin: 40, flexDirection: 'row', alignItems:'center', justifyContent:'space-between'}}>
                     <View>
                         <Text>Social</Text>
                     </View>
@@ -65,7 +71,7 @@ export default function Inicio(){
                     <View>
                         <Text>Profissional</Text>
                     </View>
-                </View>
+                </View> */}
             </View>            
         </View>
     );

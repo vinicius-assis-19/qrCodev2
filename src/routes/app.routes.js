@@ -12,7 +12,7 @@ const Tab = createBottomTabNavigator();
 
 const icons ={
   Inicio:{
-    name: 'home'
+    name: 'home-outline'
   },
   Scanner:{
     name: 'scan'
@@ -30,8 +30,7 @@ const AppRoutes = () => (
         return<Icon name={name} color={color} size={size} />
         }
     })}  
-    >  
-    {/* <Tab.Screen name="Login" component={Login} /> */}
+    >      
     <Tab.Screen name="Inicio" component={Inicio} />
     <Tab.Screen name="Scanner" component={Scanner} />
     {/* <Tab.Screen name="QRCodeScreen" component={QRCodeScreen} /> */}

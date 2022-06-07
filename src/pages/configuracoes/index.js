@@ -154,7 +154,7 @@ export default function Inicio(){
                         </View>           
                     </View>
                     <View style={styles.containerBtn}>
-                        <TouchableOpacity onPress={() => conteudos.editarUsuario(verUsuario, linkInstagram, linkFacebook, linkWhatsapp)}>
+                        <TouchableOpacity onPress={() => editarUsuario(verUsuario, linkInstagram, linkFacebook, linkWhatsapp)}>
                             <Text style={{color: 'white', fontWeight: 'bold'}}>Salvar alterações</Text>
                         </TouchableOpacity>
                     </View>

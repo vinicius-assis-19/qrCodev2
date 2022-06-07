@@ -10,6 +10,7 @@ import ImgToBase64 from 'react-native-image-base64';
 import { getStorage } from 'firebase';
 import SliderNativeComponent from 'react-native/Libraries/Components/Slider/SliderNativeComponent';
 import ImageCropPicker from 'react-native-image-crop-picker'
+import AuthContext from '../context/auth';
 
 const getDados = async()=>{
     Alert.alert("batata")
@@ -75,6 +76,7 @@ const getFoto = async()=>{
 }
 
 const editarUsuario = async(verUsuario, linkInstagram, linkFacebook, linkWhatsapp)=>{
+    const {user} = useContext(AuthContext)
     await firebase.database().ref('usuario')
     .child(user.uid)            
     .update({
