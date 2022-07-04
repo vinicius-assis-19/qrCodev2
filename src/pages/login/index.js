@@ -10,12 +10,16 @@ import {
     Alert
 } from 'react-native';
 import AuthContext from '../../context/auth'
+import AsyncStorage from '@react-native-community/async-storage';
 
 export default function Login(){   
     const navigation = useNavigation();
     const[email, setEmail] = useState('')
     const[password, setPassword] = useState('')
-    const { signed, signIn, } = useContext(AuthContext);        
+    const { signed, signIn, user} = useContext(AuthContext);        
+    useEffect(()=>{
+        
+    })    
 
     return(
         <View style={styles.containerPrincipal}>
@@ -23,7 +27,7 @@ export default function Login(){
             <View style={{margin: 10}}>
                 <TextInput
                     style={{borderBottomColor: 'black', borderBottomWidth: 1}}
-                    placeholder='usuario'
+                    placeholder='email'
                     value={email}
                     onChangeText={text => setEmail(text)}
                     autoCapitalize="none"

@@ -5,8 +5,7 @@ import Icon from 'react-native-vector-icons/Ionicons';
 
 import Inicio from '../pages/Inicio';
 import Scanner from '../pages/Scanner';
-import QRCodeScreen from '../pages/QRCodeScreen';
-import Configuracoes from '../pages/configuracoes';
+import Configuracoes from '../pages/Configuracoes';
 
 const Tab = createBottomTabNavigator();
 
@@ -23,18 +22,17 @@ const icons ={
 };
 
 const AppRoutes = () => (
-    <Tab.Navigator    
-    screenOptions={ ({route})=>({
+    <Tab.Navigator     
+      screenOptions={({route})=>({
+        headerShown: false,                  
         tabBarIcon: ({color,size})=>{
-        const{name} = icons[route.name];
-        return<Icon name={name} color={color} size={size} />
-        }
-    })}  
+          const{name} = icons[route.name];
+          return<Icon name={name} color={color} size={size} />
+        }            
+      })}
     >      
-    <Tab.Screen name="Inicio" component={Inicio} />
-    <Tab.Screen name="Scanner" component={Scanner} />
-    {/* <Tab.Screen name="QRCodeScreen" component={QRCodeScreen} /> */}
-    <Tab.Screen name="Configuracoes" component={Configuracoes} />
+      <Tab.Screen name="Inicio" component={Inicio} />      
+      <Tab.Screen name="Configuracoes" component={Configuracoes} />     
     </Tab.Navigator>      
 );
 

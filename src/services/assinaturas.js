@@ -9,16 +9,8 @@ const signIn = async(email, password) => {
     const user = await firebase.auth().signInWithEmailAndPassword(email, password)
     .then( async(value)=>{
         let user = value.user.uid        
+        console.log(user)
         return user
-        .then((snapshot) =>{
-            let data = {
-                uid: uid,
-                nome: nome,
-                email: snapshot.val().email
-            };
-            setUsuario(data);
-            guardarUsuario(data);
-        })
     })
     .catch((error)=>{
         let errorCode = error.code
@@ -48,6 +40,7 @@ const signUp = async(email, password, nome) =>{
             nome:nome,
             email: email,
         })
+        Alert.alert("Cadastrado com sucesso")
         .then((snapshot) =>{
             let data = {
                 uid: uid,

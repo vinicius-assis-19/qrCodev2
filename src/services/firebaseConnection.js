@@ -15,9 +15,9 @@ let firebaseConfig = {
   };  
   
   if(!firebase.apps.length){
-    firebase.initializeApp(firebaseConfig);    
+    firebase.initializeApp(firebaseConfig);        
   }
   
-  firebase.auth();  
+  firebase.app();
   
   export default firebase;

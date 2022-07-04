@@ -1,19 +1,16 @@
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import {createStackNavigator} from '@react-navigation/stack'
 
-import Login from '../pages/login';
-import Cadastro from '../pages/cadastro';
+import Login from '../pages/Login';
+import Cadastro from '../pages/Cadastro';
 
-const Tab = createBottomTabNavigator();
+const Tab = createStackNavigator();
 
 const AuthRoutes = () => (
-    <Tab.Navigator
-        screenOptions={{
-            tabBarVisible:false
-        }}
-    >    
-        <Tab.Screen options={{tabBarVisible: true}} name="Login" component={Login} />
-        <Tab.Screen options={{tabBarVisible: true}} name="Cadastro" component={Cadastro} />
+    <Tab.Navigator>    
+        <Tab.Screen name="Login" component={Login} />
+        <Tab.Screen name="Cadastro" component={Cadastro} />
     </Tab.Navigator>
 );
 

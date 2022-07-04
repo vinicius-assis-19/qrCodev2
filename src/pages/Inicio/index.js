@@ -4,75 +4,75 @@ import firebase from '../../services/firebaseConnection';
 import Icon from 'react-native-vector-icons/Ionicons';
 import AuthContext from '../../context/auth';
 import QRCode from 'react-native-qrcode-svg';
+import Loading from '../../components/loading';
+import Header from '../../components/header';
 
-export default function Inicio(){    
-    const [usuario, setUsuario] = useState('');
-    const [nome, setNome] = useState('');
-    const [imagemPerfil, setImagemPerfil] = useState('');
-    const [dados, setDados] = useState('');
-    const {user} = useContext(AuthContext)
-    // const [isEnabled, setIsEnabled] = useState(false);
-    // const toggleSwitch = () => setIsEnabled(previousState => !previousState);
+export default function Inicio(){        
+    const {token, carregarUsuario, dados} = useContext(AuthContext);
+    // const [dados, setDados] = useState({});
+    const linkWeb = 'https://script.google.com/macros/s/AKfycbxzKIUECXKbU7cx7_gHvVgn2PWQCDPR1mqBwnkqhXu0iZmR4qAWfdnTqGnW9Da4FYJX/exec?'
+    const linkInstagram = dados ? "instagram=https://www.instagram.com/" + dados.instagram : ''
+    const linkFacebook = dados ? "&facebook=https://www.facebook.com/" + dados.facebook : ''
+    const linkWhatsapp = dados ? "&whatsapp=https://api.whatsapp.com/send?phone=" + dados.whatsapp : ''
+    const [isEnabled, setIsEnabled] = useState(false);
+    const toggleSwitch = () => setIsEnabled(previousState => !previousState);
 
     useEffect(()=>{        
-        async function carregarUsuario(){
-            await firebase.database().ref('usuario')
-            .child(user.uid)            
-            .on('value', (snapshot)=>{
-                var nome = snapshot.child("nome").val();
-                var imagemPerfil = snapshot.child("imagemPerfil").val();                
-                setUsuario(nome)
-                setImagemPerfil(imagemPerfil)
-            })
-        }
         carregarUsuario();
     }, []);
 
-    
     return(
-        <View style={styles.containerPrincipal}>
-            <View style={{backgroundColor: 'blue', width: '100%', height:'15%'}}>              
-            </View>            
-            <View style={{backgroundColor: 'white', flex: 1, width: '100%', height:'85%',  alignItems: 'center',}}>
-                <View style={styles.containerImagem}>
-                    {!imagemPerfil ?
-                        <Icon name="person-circle"/>
-                        :
-                        <Image
-                            source={{uri: imagemPerfil}}
-                            style={{
-                                height: "70%",
-                                width: "70%"
-                            }}                        
-                        />
-                    }                    
-                </View>
-                <View style={{margin: 20}}>                    
-                    <Text style={{fontSize: 30}}>
-                        {usuario}
-                    </Text>
-                </View>
-                <View>
-                    <QRCode
-                        // value={dados.instagram}                             
-                        size={200}
-                    />
-                </View>
-                {/* <View style={{margin: 40, flexDirection: 'row', alignItems:'center', justifyContent:'space-between'}}>
-                    <View>
-                        <Text>Social</Text>
+        <View style={styles.containerPrincipal}>          
+            {!dados ?             
+                <Loading />            
+                : 
+                <>
+                    <Header />
+                    <View style={{ backgroundColor: 'blue', width: '100%', height: '15%' }}>
+                    </View><View style={{ backgroundColor: 'white', flex: 1, width: '100%', height: '85%', alignItems: 'center', }}>
+                        <View style={styles.containerImagem}>
+                            {!dados.imagemPerfil ?
+                                <Icon
+                                    name="person-circle"
+                                    style={{
+                                        fontSize: 75
+                                    }} />
+                                :
+                                <Image
+                                    source={{ uri: dados.imagemPerfil }}
+                                    style={{
+                                        height: "70%",
+                                        width: "70%"
+                                    }} />}
+                        </View>
+                        <View style={{ margin: 20 }}>
+                            <Text style={{ fontSize: 30 }}>
+                                {dados.nome}
+                            </Text>
+                        </View>
+                        <View>
+                            <QRCode
+                                value={linkWeb + linkInstagram + linkFacebook + linkWhatsapp}
+                                size={300} />
+                        </View>
+
+                        <View style={{ margin: 40, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+                            <View>
+                                <Text>Social</Text>
+                            </View>
+                            <View>
+                                <Switch
+                                    onValueChange={toggleSwitch}
+                                    value={isEnabled} />
+                            </View>
+                            <View>
+                                <Text>Profissional</Text>
+                            </View>
+                        </View>
+
                     </View>
-                    <View>
-                        <Switch
-                            onValueChange={toggleSwitch}
-                            value={isEnabled}
-                        />    
-                    </View>
-                    <View>
-                        <Text>Profissional</Text>
-                    </View>
-                </View> */}
-            </View>            
+                </>   
+            }       
         </View>
     );
 }

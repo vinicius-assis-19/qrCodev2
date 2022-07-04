@@ -12,7 +12,7 @@ import {
 import AuthContext from '../../context/auth'
 import assinaturas from '../../services/assinaturas'
 
-export default function Login(){   
+export default function Cadastro(){   
     const navigation = useNavigation();
     const[email, setEmail] = useState('')
     const[password, setPassword] = useState('')

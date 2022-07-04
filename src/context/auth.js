@@ -1,15 +1,28 @@
-import React, { createContext, useState } from "react";
+import React, { createContext, useState, useEffect } from "react";
 import {Alert} from 'react-native'
 import assinaturas from '../services/assinaturas.js'
+import AsyncStorage from "@react-native-community/async-storage";
+import firebase from '../services/firebaseConnection';
 
 const AuthContext = createContext({ signed: Boolean });
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null)
+  const [token, setToken] = useState(null)
+  const [dados, setDados] = useState(null)
+
+  useEffect(()=>{
+    verificaToken();
+  })
+
+  const verificaToken = async()=>{    
+    // await AsyncStorage.removeItem('Auth_user')
+    const token = await AsyncStorage.getItem('Auth_user');    
+    if(token){setToken(token)}
+  }
   
   async function signIn(email, password){    
     const response = await assinaturas.signIn(email, password);      
-    setUser(response);
+    guardarUsuario(response)    
   }
 
   async function deslogando(){
@@ -20,13 +33,25 @@ export const AuthProvider = ({ children }) => {
     })
   }
 
-  async function guardarUsuario(data){
-    await AsyncStorage.setItem('Auth_user', JSON.stringify(data));
-}
+  async function guardarUsuario(token){
+    await AsyncStorage.setItem('Auth_user', token);    
+    setToken(token)  
+  } 
 
+  async function carregarUsuario(){
+    await firebase.database().ref('usuario')
+    .child(token)            
+    .on('value', (snapshot)=>{
+        var dadosBd = snapshot.val()
+        var dados ={
+            ...dadosBd
+        }        
+        setDados(dados)
+    })
+  }
 
   return (
-    <AuthContext.Provider value={{ signed: !!user, user, signIn, deslogando, guardarUsuario }}>
+    <AuthContext.Provider value={{ signed: !!token, token, signIn, deslogando, guardarUsuario, dados, carregarUsuario }}>
       {children}
     </AuthContext.Provider>
   );
