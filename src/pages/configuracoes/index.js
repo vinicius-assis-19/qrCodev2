@@ -20,7 +20,7 @@ import { awsCredential, awsCredentialConfig } from '../../../awsConfig'
 import AWS from 'aws-sdk'
 
 export default function Configuracoes(){    
-    const {token, carregarUsuario, dados} = useContext(AuthContext)
+    const {token, carregarUsuario, dados, deslogando} = useContext(AuthContext)
     const [isEnabledInstagram, setIsEnabledInstagram] = useState(false);
     const [isEnabledFacebook, setIsEnabledFacebook] = useState(false);
     const [isEnabledWhatsapp, setIsEnabledWhasapp] = useState(false);
@@ -69,10 +69,6 @@ export default function Configuracoes(){
             <ScrollView style={{backgroundColor: 'white'}}>
             <View style={{backgroundColor: 'blue', width: '100%', height:'15%'}}>              
             </View>                        
-            {/* <Image 
-            source={{uri: 'https://firebasestorage.googleapis.com/v0/b/cadfunc-c07fa.appspot.com/o/imagemPerfil%2F1656697614499.png?alt=media&token=8f9aea75-59a6-499e-be07-6fb1990111ee'}}
-            style={{width: 400, height: 400}}
-            /> */}
             <View style={{backgroundColor: 'white', flex: 1, width: '100%', height:'85%',  alignItems: 'center',}}>
                 <View style={styles.containerImagem}>
                     {!dados.imagemPerfil ?
