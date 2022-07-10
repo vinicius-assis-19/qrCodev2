@@ -9,9 +9,17 @@ const AuthContext = createContext({ signed: Boolean });
 export const AuthProvider = ({ children }) => {
   const [token, setToken] = useState(null)
   const [dados, setDados] = useState(null)
+  // const linkWeb = 'https://script.google.com/macros/s/AKfycbxzKIUECXKbU7cx7_gHvVgn2PWQCDPR1mqBwnkqhXu0iZmR4qAWfdnTqGnW9Da4FYJX/exec?'
+  const linkInstagram = dados ? "instagram=https://www.instagram.com/" + dados.instagram : ''
+  const linkFacebook = dados ? "&facebook=https://www.facebook.com/" + dados.facebook : ''
+  const linkWhatsapp = dados ? "&whatsapp=https://api.whatsapp.com/send?phone=" + dados.whatsapp : ''
+  const [linkUser, setLinkUser] = useState(null)
+  const [linkWeb, setLinkWeb] = useState(null)
 
   useEffect(()=>{
     verificaToken();
+    getEndWebPerfil();
+    getPersonLink();
   })
 
   const verificaToken = async()=>{    
@@ -38,6 +46,22 @@ export const AuthProvider = ({ children }) => {
     setToken(token)  
   } 
 
+  async function getPersonLink(){
+    if(dados){
+      let linkUser =dados ? (linkWeb + (dados.showInstagram ? linkInstagram : '') + (dados.showFacebook ? linkFacebook : '') + (dados.showWhatsapp ? linkWhatsapp : '')) : ''    
+      setLinkUser(linkUser)
+    }
+  }
+
+  async function getEndWebPerfil(){
+    await firebase.database().ref('parametros')
+    .child("endPerfil")            
+    .on('value', (snapshot)=>{
+        var endWeb = snapshot.val()
+        setLinkWeb(endWeb)
+    })
+  }
+
   async function carregarUsuario(){
     await firebase.database().ref('usuario')
     .child(token)            
@@ -51,7 +75,7 @@ export const AuthProvider = ({ children }) => {
   }
 
   return (
-    <AuthContext.Provider value={{ signed: !!token, token, signIn, deslogando, guardarUsuario, dados, carregarUsuario, deslogando }}>
+    <AuthContext.Provider value={{ signed: !!token, token, signIn, deslogando, guardarUsuario, dados, carregarUsuario, deslogando, linkUser, getPersonLink }}>
       {children}
     </AuthContext.Provider>
   );

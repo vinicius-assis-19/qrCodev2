@@ -8,34 +8,7 @@ import { getStorage } from 'firebase/storage';
 import ImageCropPicker from 'react-native-image-crop-picker'
 import AuthContext from '../context/auth';
 import {Buffer} from 'buffer'
-import { awsCredential, awsCredentialConfig } from '../../awsConfig'
-import AWS from 'aws-sdk'
 import storage from '@react-native-firebase/storage'
-
-const exemploAws = async()=>{
-    return new Promise((resolve, reject) => {
-        const s3 = new AWS.S3({
-            apiVersion: '2012-08-10'
-        })
-        if(base64Image){
-            const base64Data = new Buffer.from(base64Image.replace(/^data:image\/\w+;base64,/, ""), 'base64');
-            const type = "png"
-            s3.upload({
-                ACL: "public-read",
-                Bucket: "vendecfeed",
-                Body: base64Data,
-                Key: 'imagem-' + Date.now() + '.' + type,
-                ContentEncoding: 'base64',
-                ContentType: `image/${type}`
-            }, (error, data) => {
-                if (error)
-                    reject(error, console.log('chegando erro'))
-                else
-                    resolve({ key: data.Key, url: data.Location })
-            })
-        }
-    })
-}
 
 const exemploFirebase = async()=>{
     // if(foto){
@@ -118,46 +91,6 @@ const insertFotoTeste = async(foto)=>{
         
     // }
 }
-
-const base64Upload = async ctx =>
-    ctx.body = await insertFotoS3(ctx.request.body.base64Image)
-
-const insertFotoS3 = async(base64) =>{    
-    const base64Image = await ImgToBase64.getBase64String(base64.path)
-    const options =  awsCredential()    
-    AWS.config.update({
-        region: options.region,
-        accessKeyId: options.accessKeyId,
-        secretAccessKey: options.secretAccessKey,
-        apiVersion: options.apiVersion,
-        signatureVersion: options.signatureVersion
-    })
-    console.log(AWS.config)
-
-    return new Promise((resolve, reject) => {        
-        const s3 = new AWS.S3()
-        if(base64Image){            
-        //   const base64Data = new Buffer.from(base64Image.replace(/^data:image\/\w+;base64,/, ""), 'base64');
-          console.log(base64Image)
-          const type = "png"          
-          s3.upload({
-              ACL: "public-read",
-              Bucket: "vendecfeed",
-              Body: base64Image,
-              Key: 'imagem-' + Date.now() + '.' + type,
-              ContentEncoding: 'base64',
-              ContentType: `image/${type}`
-          }, (error, data) => {
-              if (error)
-                  reject(error, console.log('chegando erro'))
-              else
-                  resolve({ key: data.Key, url: data.Location })
-          })
-        }
-      })
-  }
-
-
 
 export default {    
     getFoto,

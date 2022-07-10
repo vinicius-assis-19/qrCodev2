@@ -1,6 +1,5 @@
 import React, {useState, useEffect, useContext} from 'react';
 import {View, Text, StyleSheet, FlatList, Alert, TextInput, Switch, Image} from 'react-native';
-import firebase from '../../services/firebaseConnection';
 import Icon from 'react-native-vector-icons/Ionicons';
 import AuthContext from '../../context/auth';
 import QRCode from 'react-native-qrcode-svg';
@@ -8,14 +7,14 @@ import Loading from '../../components/loading';
 import Header from '../../components/header';
 
 export default function Inicio(){        
-    const {token, carregarUsuario, dados} = useContext(AuthContext);
-    // const [dados, setDados] = useState({});
+    const {token, carregarUsuario, dados, linkUser} = useContext(AuthContext);
     const linkWeb = 'https://script.google.com/macros/s/AKfycbxzKIUECXKbU7cx7_gHvVgn2PWQCDPR1mqBwnkqhXu0iZmR4qAWfdnTqGnW9Da4FYJX/exec?'
     const linkInstagram = dados ? "instagram=https://www.instagram.com/" + dados.instagram : ''
     const linkFacebook = dados ? "&facebook=https://www.facebook.com/" + dados.facebook : ''
     const linkWhatsapp = dados ? "&whatsapp=https://api.whatsapp.com/send?phone=" + dados.whatsapp : ''
     const [isEnabled, setIsEnabled] = useState(false);
     const toggleSwitch = () => setIsEnabled(previousState => !previousState);
+    console.log(linkUser)
 
     useEffect(()=>{        
         carregarUsuario();
@@ -51,9 +50,13 @@ export default function Inicio(){
                             </Text>
                         </View>
                         <View>
+                            {!linkUser ? 
+                            <Loading />
+                            :
                             <QRCode
-                                value={linkWeb + linkInstagram + linkFacebook + linkWhatsapp}
+                                value={linkUser}
                                 size={300} />
+                            }
                         </View>
 
                         <View style={{ margin: 40, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>

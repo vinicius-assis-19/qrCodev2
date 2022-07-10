@@ -1,5 +1,5 @@
 'use strict'
-import React, {useState, useEffect, useContext, createContext} from 'react';
+import React, {useState, useEffect, useContext} from 'react';
 import {
     View, 
     Text, 
@@ -14,13 +14,10 @@ import {
 import firebase from '../../services/firebaseConnection';
 import Icon from 'react-native-vector-icons/Ionicons';
 import AuthContext from '../../context/auth';
-import conteudos from '../../services/conteudos'
-import {Buffer} from 'buffer'
-import { awsCredential, awsCredentialConfig } from '../../../awsConfig'
-import AWS from 'aws-sdk'
+import conteudos from '../../services/conteudos';
 
 export default function Configuracoes(){    
-    const {token, carregarUsuario, dados, deslogando} = useContext(AuthContext)
+    const {token, carregarUsuario, dados, deslogando, getPersonLink} = useContext(AuthContext)
     const [isEnabledInstagram, setIsEnabledInstagram] = useState(false);
     const [isEnabledFacebook, setIsEnabledFacebook] = useState(false);
     const [isEnabledWhatsapp, setIsEnabledWhasapp] = useState(false);
@@ -28,13 +25,6 @@ export default function Configuracoes(){
     const toggleSwitchFacebook = () => setIsEnabledFacebook(previousState => !previousState);    
     const toggleSwitchWhatsapp = () => setIsEnabledWhasapp(previousState => !previousState);        
     let [dadosAlterados, setDadosAlterados] = useState(null)        
-    const options = awsCredential()    
-    
-    AWS.config.update({
-        region: options.region,
-        accessKeyId: options.accessKeyId,
-        secretAccessKey: options.secretAccessKey,
-    })
         
     useEffect(()=>{               
         dadosParaAlterar();
@@ -45,18 +35,25 @@ export default function Configuracoes(){
             ...dados
         }
         setDadosAlterados(dadosAlterados)
+        setIsEnabledInstagram(dadosAlterados.showInstagram)
+        setIsEnabledFacebook(dadosAlterados.showFacebook)
+        setIsEnabledWhasapp(dadosAlterados.showWhatsapp)
     }
 
-    async function editarUsuario(){        
+    async function editarUsuario(){
         await firebase.database().ref('usuario')
         .child(token)            
         .update({
             nome: dadosAlterados.nome,
             instagram: dadosAlterados.instagram,
             facebook: dadosAlterados.facebook,
-            whatsapp: dadosAlterados.whatsapp
+            whatsapp: dadosAlterados.whatsapp,
+            showInstagram: isEnabledInstagram,
+            showFacebook: isEnabledFacebook,
+            showWhatsapp: isEnabledWhatsapp
         })
         Alert.alert("Dados alterados com sucesso")
+        getPersonLink();
     }
 
     const alterarFoto = async()=>{                
@@ -66,126 +63,133 @@ export default function Configuracoes(){
 
     return(
         <View style={styles.containerPrincipal}>
-            <ScrollView style={{backgroundColor: 'white'}}>
-            <View style={{backgroundColor: 'blue', width: '100%', height:'15%'}}>              
-            </View>                        
-            <View style={{backgroundColor: 'white', flex: 1, width: '100%', height:'85%',  alignItems: 'center',}}>
-                <View style={styles.containerImagem}>
-                    {!dados.imagemPerfil ?
-                        <Icon 
-                            name="person-circle"
-                            style={{
-                                fontSize:75
-                            }}                            
+            
+                <View style={{backgroundColor: 'blue', width: '100%', height:'15%'}}>              
+                </View>                        
+                <View style={{backgroundColor: 'white', flex: 1, width: '100%', height:'85%',  alignItems: 'center',}}>
+                    <View style={styles.containerImagem}>
+                        {!dados.imagemPerfil ?
+                            <Icon 
+                                name="person-circle"
+                                style={{
+                                    fontSize:75
+                                }}                            
+                            />
+                            :
+                            <Image
+                                source={{uri: dados.imagemPerfil}}
+                                style={{
+                                    height: "70%",
+                                    width: "70%"
+                                }}                        
+                            />
+                        }      
+                        <View style={{backgroundColor: 'black', borderRadius: 50, padding: 5}}>
+                            <TouchableOpacity onPress={()=>alterarFoto()}>
+                                <Icon name='camera-outline' size={25} color={'white'}/>
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+                    <View style={{margin: 20}}>                    
+                        <TextInput
+                            style={{fontSize: 30}}
+                            value = {dadosAlterados ? dadosAlterados.nome : ''}
+                            onChangeText={text => setDadosAlterados(dadosAlterados={
+                                ...dadosAlterados,
+                                nome: text
+                            })}
                         />
-                        :
-                        <Image
-                            source={{uri: dados.imagemPerfil}}
-                            style={{
-                                height: "70%",
-                                width: "70%"
-                            }}                        
-                        />
-                    }      
-                    <View style={{backgroundColor: 'black', borderRadius: 50, padding: 5}}>
-                        <TouchableOpacity onPress={()=>alterarFoto()}>
-                            <Icon name='camera-outline' size={25} color={'white'}/>
-                        </TouchableOpacity>
                     </View>
-                </View>
-                <View style={{margin: 20}}>                    
-                    <TextInput
-                        style={{fontSize: 30}}
-                        value = {dadosAlterados ? dadosAlterados.nome : ''}
-                        onChangeText={text => setDadosAlterados(dadosAlterados={
-                            ...dadosAlterados,
-                            nome: text
-                        })}
-                    />
-                </View>
-                <View style={{flex: 1, flexDirection: 'column', justifyContent: 'center', alignItems: 'center'}}>
-                    <View style={styles.containerLinks}>   
-                        <View style={styles.containerIcons}>                     
-                            <Icon name="logo-instagram" size={50}/>
+                    <View style={{flex: 1, flexDirection: 'column', justifyContent: 'center', alignItems: 'center'}}>
+                        <View style={styles.containerLinks}>   
+                            <View style={styles.containerIcons}>                     
+                                <Icon name="logo-instagram" size={50}/>
+                            </View>
+                            <View style={styles.containerTitulo}>
+                                <Text>Instagram</Text>  
+                            </View>
+                            <View style={styles.containerInput}>
+                                <TextInput
+                                    placeholder=' @'
+                                    value={dadosAlterados ? dadosAlterados.instagram : ''}
+                                    autoCapitalize='none'
+                                    onChangeText={text => setDadosAlterados(dadosAlterados={
+                                        ...dadosAlterados,
+                                        instagram: text
+                                    })}
+                                />    
+                            </View>   
+                            
+                            <View style={styles.containerSwitch}>
+                                <Switch
+                                    onValueChange={toggleSwitchInstagram}
+                                    value={isEnabledInstagram}
+                                />    
+                            </View>           
                         </View>
-                        <View style={styles.containerTitulo}>
-                            <Text>Instagram</Text>  
+                        <View style={styles.containerLinks}>   
+                            <View style={styles.containerIcons}>                     
+                                <Icon name="md-logo-facebook" size={50}/>
+                            </View>
+                            <View style={styles.containerTitulo}>
+                                <Text>Facebook</Text>  
+                            </View>
+                            <View style={styles.containerInput}>
+                                <TextInput
+                                    placeholder=' @'
+                                    value={dadosAlterados ?  dadosAlterados.facebook : ''}
+                                    autoCapitalize='none'
+                                    onChangeText={text => setDadosAlterados(dadosAlterados={
+                                        ...dadosAlterados,
+                                        facebook: text
+                                    })}
+                                />    
+                            </View>   
+                            <View style={styles.containerSwitch}>
+                                <Switch
+                                    onValueChange={toggleSwitchFacebook}
+                                    value={isEnabledFacebook}
+                                />    
+                            </View>           
                         </View>
-                        <View style={styles.containerInput}>
-                            <TextInput
-                                placeholder=' @'
-                                value={dadosAlterados ? dadosAlterados.instagram : ''}
-                                autoCapitalize='none'
-                                onChangeText={text => setDadosAlterados(dadosAlterados={
-                                    ...dadosAlterados,
-                                    instagram: text
-                                })}
-                            />    
-                        </View>   
-                        <View style={styles.containerSwitch}>
-                            <Switch
-                                onValueChange={toggleSwitchInstagram}
-                                value={isEnabledInstagram}
-                            />    
-                        </View>           
+                        <View style={styles.containerLinks}>   
+                            <View style={styles.containerIcons}>                     
+                                <Icon name="logo-whatsapp" size={50}/>
+                            </View>
+                            <View style={styles.containerTitulo}>
+                                <Text>WhatsApp</Text>  
+                            </View>
+                            <View style={styles.containerInput}>
+                                <TextInput
+                                    placeholder=' cel'
+                                    value={dadosAlterados ? dadosAlterados.whatsapp : ''}
+                                    onChangeText={text => setDadosAlterados(dadosAlterados={
+                                        ...dadosAlterados,
+                                        whatsapp: text
+                                    })}
+                                />    
+                            </View>   
+                            <View style={styles.containerSwitch}>
+                                <Switch
+                                    onValueChange={toggleSwitchWhatsapp}
+                                    value={isEnabledWhatsapp}
+                                />    
+                            </View>           
+                        </View>
+                        <View style={styles.containerBtn}>
+                            <TouchableOpacity onPress={() => editarUsuario()}>
+                                <Text style={{color: 'white', fontWeight: 'bold'}}>Salvar alterações</Text>
+                            </TouchableOpacity>
+                        </View>
+                        <View style={styles.containerBtn}>
+                            <TouchableOpacity onPress={() => deslogando()}>
+                                <Text style={{color: 'white', fontWeight: 'bold'}}>Logout</Text>
+                            </TouchableOpacity>
+                        </View>
+                        
                     </View>
-                    <View style={styles.containerLinks}>   
-                        <View style={styles.containerIcons}>                     
-                            <Icon name="md-logo-facebook" size={50}/>
-                        </View>
-                        <View style={styles.containerTitulo}>
-                            <Text>Facebook</Text>  
-                        </View>
-                        <View style={styles.containerInput}>
-                            <TextInput
-                                placeholder=' @'
-                                value={dadosAlterados ?  dadosAlterados.facebook : ''}
-                                autoCapitalize='none'
-                                onChangeText={text => setDadosAlterados(dadosAlterados={
-                                    ...dadosAlterados,
-                                    facebook: text
-                                })}
-                            />    
-                        </View>   
-                        <View style={styles.containerSwitch}>
-                            <Switch
-                                onValueChange={toggleSwitchFacebook}
-                                value={isEnabledFacebook}
-                            />    
-                        </View>           
-                    </View>
-                    <View style={styles.containerLinks}>   
-                        <View style={styles.containerIcons}>                     
-                            <Icon name="logo-whatsapp" size={50}/>
-                        </View>
-                        <View style={styles.containerTitulo}>
-                            <Text>WhatsApp</Text>  
-                        </View>
-                        <View style={styles.containerInput}>
-                            <TextInput
-                                placeholder=' cel'
-                                value={dadosAlterados ? dadosAlterados.whatsapp : ''}
-                                onChangeText={text => setDadosAlterados(dadosAlterados={
-                                    ...dadosAlterados,
-                                    whatsapp: text
-                                })}
-                            />    
-                        </View>   
-                        <View style={styles.containerSwitch}>
-                            <Switch
-                                onValueChange={toggleSwitchWhatsapp}
-                                value={isEnabledWhatsapp}
-                            />    
-                        </View>           
-                    </View>
-                    <View style={styles.containerBtn}>
-                        <TouchableOpacity onPress={() => editarUsuario()}>
-                            <Text style={{color: 'white', fontWeight: 'bold'}}>Salvar alterações</Text>
-                        </TouchableOpacity>
-                    </View>
-                </View>
-            </View>            
-            </ScrollView>
+                </View>            
+            
         </View>
     );
 }
