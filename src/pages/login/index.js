@@ -37,6 +37,7 @@ export default function Login(){
                     placeholder='senha'
                     value={password}
                     onChangeText={text => setPassword(text)}
+                    autoCapitalize='none'
                     secureTextEntry
                 />                             
                 <View style={styles.containerBtn}>

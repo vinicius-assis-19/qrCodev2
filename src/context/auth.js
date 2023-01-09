@@ -3,6 +3,8 @@ import {Alert} from 'react-native'
 import assinaturas from '../services/assinaturas.js'
 import AsyncStorage from "@react-native-community/async-storage";
 import firebase from '../services/firebaseConnection';
+import { useNavigation } from "@react-navigation/native";
+import ImgToBase64 from 'react-native-image-base64';
 
 const AuthContext = createContext({ signed: Boolean });
 
@@ -10,11 +12,13 @@ export const AuthProvider = ({ children }) => {
   const [token, setToken] = useState(null)
   const [dados, setDados] = useState(null)
   // const linkWeb = 'https://script.google.com/macros/s/AKfycbxzKIUECXKbU7cx7_gHvVgn2PWQCDPR1mqBwnkqhXu0iZmR4qAWfdnTqGnW9Da4FYJX/exec?'
-  const linkInstagram = dados ? "instagram=https://www.instagram.com/" + dados.instagram : ''
+  const linkInstagram = dados ? "&instagram=https://www.instagram.com/" + dados.instagram : ''
   const linkFacebook = dados ? "&facebook=https://www.facebook.com/" + dados.facebook : ''
   const linkWhatsapp = dados ? "&whatsapp=https://api.whatsapp.com/send?phone=" + dados.whatsapp : ''
   const [linkUser, setLinkUser] = useState(null)
   const [linkWeb, setLinkWeb] = useState(null)
+  const [ foto64, setFoto64] = useState(null)
+  const navigation = useNavigation()
 
   useEffect(()=>{
     verificaToken();
@@ -33,11 +37,16 @@ export const AuthProvider = ({ children }) => {
     guardarUsuario(response)    
   }
 
+  async function signUp(email, password, nome){  
+    const response = await assinaturas.signUp(email, password, nome);      
+    // await guardarUsuario(response)    
+  }
+
   async function deslogando(){
     await firebase.auth().signOut();
     await AsyncStorage.clear()
     .then( () =>{
-        setUsuario(null);
+        setToken(null)
     })
   }
 
@@ -46,9 +55,15 @@ export const AuthProvider = ({ children }) => {
     setToken(token)  
   } 
 
+  async function getFotos(){
+    ImgToBase64.getBase64String(dados.imagemPerfil)
+    .then(base64String => console.log(base64String))
+    .catch(err => console.log(err));
+  }
+
   async function getPersonLink(){
     if(dados){
-      let linkUser =dados ? (linkWeb + (dados.showInstagram ? linkInstagram : '') + (dados.showFacebook ? linkFacebook : '') + (dados.showWhatsapp ? linkWhatsapp : '')) : ''    
+      let linkUser =dados ? (linkWeb + ("id=" + token)) : ''    
       setLinkUser(linkUser)
     }
   }
@@ -70,12 +85,13 @@ export const AuthProvider = ({ children }) => {
         var dados ={
             ...dadosBd
         }        
-        setDados(dados)
+        setDados(dados)        
+        setFoto64(dados.imagemPerfil)   
     })
   }
 
   return (
-    <AuthContext.Provider value={{ signed: !!token, token, signIn, deslogando, guardarUsuario, dados, carregarUsuario, deslogando, linkUser, getPersonLink }}>
+    <AuthContext.Provider value={{ signed: !!token, token, signIn, deslogando, guardarUsuario, dados, carregarUsuario, linkUser, getPersonLink, signUp }}>
       {children}
     </AuthContext.Provider>
   );

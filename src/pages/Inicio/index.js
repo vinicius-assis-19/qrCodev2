@@ -1,10 +1,11 @@
-import React, {useState, useEffect, useContext} from 'react';
-import {View, Text, StyleSheet, FlatList, Alert, TextInput, Switch, Image} from 'react-native';
+import React, {useState, useEffect, useContext, } from 'react';
+import {View, Text, StyleSheet, FlatList, Alert, TextInput, Switch, Image, TouchableOpacity} from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import AuthContext from '../../context/auth';
 import QRCode from 'react-native-qrcode-svg';
 import Loading from '../../components/loading';
 import Header from '../../components/header';
+import NfcManager, {NfcTech, Ndef, nfcManager} from 'react-native-nfc-manager';
 
 export default function Inicio(){        
     const {token, carregarUsuario, dados, linkUser} = useContext(AuthContext);
@@ -14,11 +15,35 @@ export default function Inicio(){
     const linkWhatsapp = dados ? "&whatsapp=https://api.whatsapp.com/send?phone=" + dados.whatsapp : ''
     const [isEnabled, setIsEnabled] = useState(false);
     const toggleSwitch = () => setIsEnabled(previousState => !previousState);
-    console.log(linkUser)
 
     useEffect(()=>{        
+        NfcManager.start();
         carregarUsuario();
     }, []);
+
+    async function writeNdef({type, value}) {
+        let result = false;
+      
+        try {
+          // STEP 1
+          await NfcManager.requestTechnology(NfcTech.Ndef);
+      
+          const bytes = Ndef.encodeMessage([Ndef.textRecord('Hello NFC')]);
+      
+          if (bytes) {
+            await NfcManager.ndefHandler // STEP 2
+              .writeNdefMessage(bytes); // STEP 3
+            result = true;
+          }
+        } catch (ex) {
+          console.warn(ex);
+        } finally {
+          // STEP 4
+          NfcManager.cancelTechnologyRequest();
+        }
+      
+        return result;
+      }
 
     return(
         <View style={styles.containerPrincipal}>          
@@ -40,8 +65,9 @@ export default function Inicio(){
                                 <Image
                                     source={{ uri: dados.imagemPerfil }}
                                     style={{
-                                        height: "70%",
-                                        width: "70%"
+                                        height: "100%",
+                                        width: "100%",
+                                        borderRadius: 100
                                     }} />}
                         </View>
                         <View style={{ margin: 20 }}>
@@ -58,6 +84,13 @@ export default function Inicio(){
                                 size={300} />
                             }
                         </View>
+                        <TouchableOpacity onPress={()=>{writeNdef()}}>
+                            <View style={{backgroundColor:"black"}}>
+                                <Text style={{color: "white"}}>
+                                    NFC
+                                </Text>
+                            </View>
+                        </TouchableOpacity>
 
                         <View style={{ margin: 40, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
                             <View>

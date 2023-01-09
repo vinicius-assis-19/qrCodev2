@@ -4,6 +4,7 @@ import {
     Alert
 } from 'react-native'
 import AsyncStorage from '@react-native-community/async-storage';
+import Loading from '../components/loading'
 
 const signIn = async(email, password) => {            
     const user = await firebase.auth().signInWithEmailAndPassword(email, password)
@@ -50,7 +51,6 @@ const signUp = async(email, password, nome) =>{
             setUsuario(data);
             guardarUsuario(data);
         })
-
     })
     .catch((error) => {
         let errorCode = error.code

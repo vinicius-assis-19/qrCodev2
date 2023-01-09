@@ -9,7 +9,8 @@ import {
     TextInput, 
     Switch, 
     Image,         
-    ScrollView
+    ScrollView,    
+    SafeAreaView
 } from 'react-native';
 import firebase from '../../services/firebaseConnection';
 import Icon from 'react-native-vector-icons/Ionicons';
@@ -58,12 +59,16 @@ export default function Configuracoes(){
 
     const alterarFoto = async()=>{                
         const foto = await conteudos.getFoto()          
-        const up = await conteudos.uploadTeste(foto)
+        let up = await conteudos.uploadTeste(foto)
+        await firebase.database().ref('usuario')
+        .child(token)            
+        .update({
+            imagemPerfil: up
+        })
     }
 
-    return(
-        <View style={styles.containerPrincipal}>
-            
+    return(        
+        <View style={styles.containerPrincipal}>            
                 <View style={{backgroundColor: 'blue', width: '100%', height:'15%'}}>              
                 </View>                        
                 <View style={{backgroundColor: 'white', flex: 1, width: '100%', height:'85%',  alignItems: 'center',}}>
@@ -79,12 +84,13 @@ export default function Configuracoes(){
                             <Image
                                 source={{uri: dados.imagemPerfil}}
                                 style={{
-                                    height: "70%",
-                                    width: "70%"
+                                    height: "100%",
+                                    width: "100%",
+                                    borderRadius: 100
                                 }}                        
                             />
                         }      
-                        <View style={{backgroundColor: 'black', borderRadius: 50, padding: 5}}>
+                        <View style={{backgroundColor: 'black', borderRadius: 50, padding: 5, marginTop: -35}}>
                             <TouchableOpacity onPress={()=>alterarFoto()}>
                                 <Icon name='camera-outline' size={25} color={'white'}/>
                             </TouchableOpacity>
@@ -99,7 +105,12 @@ export default function Configuracoes(){
                                 nome: text
                             })}
                         />
-                    </View>
+                    </View>                    
+                    <ScrollView    
+                        bounces={false}
+                        showsVerticalScrollIndicator={false}
+                        contentContainerStyle={{ flexGrow: 1 }}
+                    >
                     <View style={{flex: 1, flexDirection: 'column', justifyContent: 'center', alignItems: 'center'}}>
                         <View style={styles.containerLinks}>   
                             <View style={styles.containerIcons}>                     
@@ -188,9 +199,10 @@ export default function Configuracoes(){
                         </View>
                         
                     </View>
+                    </ScrollView>                    
                 </View>            
             
-        </View>
+        </View>        
     );
 }
 

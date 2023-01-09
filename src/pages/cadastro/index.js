@@ -17,7 +17,11 @@ export default function Cadastro(){
     const[email, setEmail] = useState('')
     const[password, setPassword] = useState('')
     const[nome, setNome] = useState('')
-    const { signed, signIn, } = useContext(AuthContext);        
+    const { signed, signIn, signUp} = useContext(AuthContext); 
+    
+    const cadastrando = async()=>{
+        await signUp(email, password, nome)
+    }
 
     return(
         <View style={styles.containerPrincipal}>
@@ -27,23 +31,26 @@ export default function Cadastro(){
                     style={{borderBottomColor: 'black', borderBottomWidth: 1}}
                     placeholder='nome'
                     value={nome}
-                    onChangeText={text => setNome(text)}                    
+                    onChangeText={text => setNome(text)}         
+                    autoCapitalize='none'           
                 />                             
                 <TextInput
                     style={{borderBottomColor: 'black', borderBottomWidth: 1}}
-                    placeholder='usuario'
+                    placeholder='email'
                     value={email}
                     onChangeText={text => setEmail(text)}
+                    autoCapitalize='none'
                 />
                 <TextInput
                     style={{borderBottomColor: 'black', borderBottomWidth: 1}}
                     placeholder='senha'
                     value={password}
                     onChangeText={text => setPassword(text)}
+                    autoCapitalize='none'
                     secureTextEntry
                 />                             
                 <View style={styles.containerBtn}>
-                    <TouchableOpacity style={styles.btnLogin} onPress={() => assinaturas.signUp(email, password, nome)}>
+                    <TouchableOpacity style={styles.btnLogin} onPress={() => cadastrando()}>
                         <Text style={{color: "white", fontSize:18, fontWeight:'bold'}}>Cadastrar</Text>
                     </TouchableOpacity>
                 </View>

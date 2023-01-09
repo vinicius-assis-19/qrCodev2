@@ -6,6 +6,7 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import Inicio from '../pages/Inicio';
 import Scanner from '../pages/Scanner';
 import Configuracoes from '../pages/Configuracoes';
+import NfcTeste from '../pages/Nfcteste'
 
 const Tab = createBottomTabNavigator();
 
@@ -17,6 +18,9 @@ const icons ={
     name: 'scan'
   },
   Configuracoes:{
+    name: 'settings'
+  },
+  NfcTeste:{
     name: 'settings'
   }
 };
@@ -33,6 +37,7 @@ const AppRoutes = () => (
     >      
       <Tab.Screen name="Inicio" component={Inicio} />      
       <Tab.Screen name="Configuracoes" component={Configuracoes} />     
+      <Tab.Screen name="NfcTeste" component={NfcTeste} />     
     </Tab.Navigator>      
 );
 
